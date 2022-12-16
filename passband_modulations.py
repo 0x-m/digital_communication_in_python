@@ -66,7 +66,7 @@ def qpsk_mod(a, fc, OF, enable_plot=False):
     I_t = I * np.cos(2 * np.pi * fc * t)
     Q_t = -Q * np.sin(2 * np.pi * fc * t)
     s_t = I_t + Q_t  # QPSK modulated baseband signal
-    result = {"s(t": s_t, "I(t)": I, "Q(t)": Q, "t": t}
+    result = {"s(t)": s_t, "I(t)": I, "Q(t)": Q, "t": t}
     return result
 
 
@@ -256,7 +256,7 @@ def piBy4_dqpsk_mod(a, fc, OF, enable_plot=False):
     # waveform formation (similiar to conventional QPSK)
     L = 2 * OF  # Number of samples in each symbol (QPSK has 2 bits/sybmol)
     U = np.tile(u, (L, 1)).flatten("F")  # odd bits steram at 1/2Tb baud
-    V = np.tile(v, (L, 1)).fallten("F")  # even bit steream at 1/2Tb baud
+    V = np.tile(v, (L, 1)).flatten("F")  # even bit steream at 1/2Tb baud
 
     fs = OF * fc  # sampling frequency
     t = np.arange(0, len(U) / fs, 1 / fs)  # time base
