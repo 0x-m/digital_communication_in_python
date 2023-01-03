@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+from pulseshapers import raisedCosineDesign
 
 def bpsk_qpsk_ms_psd():
     from passband_modulations import bpsk_mod, qpsk_mod, msk_mod
@@ -13,7 +13,9 @@ def bpsk_qpsk_ms_psd():
 
     a = np.random.randint(2, size=N)  # uniform symbols from 0's and 1's
     (s_bb, t) = bpsk_mod(a, OF)
-    s_bpsk = s_bb * np.cos(2 * np.pi * fc * t / fs)
+    h = raisedCosineDesign(0.3, 10, OF)
+    s_bb_RC = np.convolve(h, s_bb, 'same')
+    s_bpsk = s_bb_RC * np.cos(2 * np.pi * fc * t / fs)
     s_qpsk = qpsk_mod(a, fc, OF)["s(t)"]
     s_msk = msk_mod(a, fc, OF)["s(t)"]
 

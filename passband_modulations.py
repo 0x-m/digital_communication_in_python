@@ -427,17 +427,39 @@ def msk_demod(r, N, fc, OF):
     x = abs(np.cos(np.pi * t / (2 * Tb)))
     y = abs(np.sin(np.pi * t / (2 * Tb)))
 
-    u = r*x*np.cos(2*np.pi*fc*t) # multiply I by half cosines and cos(2pifct)
-    v = -r*y*np.sin(2*np.pi*fc*t) # multiply Q by half sines and sin(2pifct)
-    
-    iHat = np.convolve(u, np.ones(L)) # integrate for L 
+    u = r * x * np.cos(2 * np.pi * fc * t)  # multiply I by half cosines and cos(2pifct)
+    v = -r * y * np.sin(2 * np.pi * fc * t)  # multiply Q by half sines and sin(2pifct)
+
+    iHat = np.convolve(u, np.ones(L))  # integrate for L
     qHat = np.convolve(v, np.ones(L))
 
-    iHat = iHat[L-1:-1-L:L] # I sample at the end of every symbol
-    qHat = qHat[L + L//2 - 1: -1 - L//2: L] # Q sample from L + L//2th sample
+    iHat = iHat[L - 1 : -1 - L : L]  # I sample at the end of every symbol
+    qHat = qHat[L + L // 2 - 1 : -1 - L // 2 : L]  # Q sample from L + L//2th sample
 
     a_hat = np.zeros(N)
-    a_hat[0::2] = iHat > 0 # thresholding even bits
-    a_hat[1::2] = qHat > 0 # thesholding odd bits
-    
+    a_hat[0::2] = iHat > 0  # thresholding even bits
+    a_hat[1::2] = qHat > 0  # thesholding odd bits
+
     return a_hat
+
+
+def gaussianLPF(BT, Tb, L, k):
+    '''
+    Generate filter coefficient of Gaussian low pass filter (used in gmsk mod)
+    Parameters:
+        BT: BT prouct - Bandwidth x bit period
+        Tb: bit period
+        L: oversampling factor (number of samples per bit)
+        k: span length of the pulse (bit interval)
+    Returns:
+        h_norm: normalized filter coefficient of Gaussian LPF
+    '''
+    
+    B = BT / Tb  #bandwidth of the filter
+    # truncated time limits for the filter
+    t = np.arange(start=-k*Tb, stop=k*Tb + Tb/L, step=Tb/L)
+    h = B * np.sqrt(2*np.pi/(np.log(2)))*np.exp(-2*(t*np.pi*B)**2 / (np.log(2)))
+    h_norm = h / np.sum(h)
+    return h_norm
+    
+    
